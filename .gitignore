@@ -1,0 +1,23 @@
+# data is downloaded by scripts/download_data.py (GPL-2.0, not redistributed)
+data/*.mat
+results/quick/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+# LaTeX build files
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.log
+paper/*.out
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.synctex.gz
+# outputs of a fresh run (the stored paper results are in results/reference/)
+results/raw/
+results/analysis.json

@@ -1,0 +1,81 @@
+\section{Results}
+\label{sec:results}
+
+\subsection{Reproducing published results}
+\label{sec:res-repro}
+
+\input{tables/tab_repro}
+
+\Cref{tab:repro} compares our implementation with three published sets of School results. Under the protocol of \citet{argyriou2008convex}, all four methods with a published counterpart land within one standard deviation of the reported value, and trace-norm MTL is within 0.2 points (26.5\% against 26.7\%). The ranking is identical: pooled and independent ridge are close, $\ell_{2,1}$ MTL is slightly better, and trace-norm MTL is clearly better, winning on all 10 splits against independent ridge by $4.4 \pm 0.5$ points. Under the protocol of \citet{kumar2012learning}, trace-norm MTL reaches an RMSE of 10.07 exam points against 10.04 reported for GO-MTL, another method that ties tasks to a shared low-dimensional basis. Our independent ridge baseline (10.34) is stronger than the published one (10.67), which used a different feature encoding (26 attributes) and tuning procedure. The two partial-pooling estimators score 27.3\% explained variance and 10.02 RMSE, above every linear method we reproduced but below the published MTRL and multi-task Gaussian process results, which we did not re-implement.
+
+\subsection{Learning curves: the pooled model wins when data are scarce}
+\label{sec:res-curves}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{fig2_learning_curves.pdf}
+\caption{Test nMSE as a function of the training fraction per school (log scale). (a) Absolute error; error bars are one standard deviation over 10 splits. (b) Error relative to pooled ridge for the three strongest multi-task methods; negative values beat the pooled model. Trace-norm MTL overtakes pooled ridge only between 20\% and 30\%, whereas mean-regularized MTL (thick green) is at or below the pooled model at every training fraction.}
+\label{fig:curves}
+\end{figure}
+
+\input{tables/tab_main}
+\input{tables/tab_paired}
+
+\Cref{fig:curves} and \cref{tab:main} show how each method behaves as the training fraction grows from 5\% to 75\%. The usual multi-task story holds against independent models: trace-norm MTL beats independent ridge on all 10 splits at every training fraction, by 19.2\% in nMSE at 5\% and 4.4\% at 75\%, and $\ell_{2,1}$ MTL sits between the two (\cref{tab:paired}).
+
+The pooled model tells a different story. Its error barely changes with the amount of data (nMSE 0.677 at 5\% and 0.656 at 75\%), because the part of the scores it cannot explain is school-specific. Yet at small training fractions it beats every per-school method. Trace-norm MTL is worse than pooled ridge on all 10 splits up to 20\% training, by 24.7\% at 5\% and still 1.5\% at 20\%. It overtakes the pooled model between 20\% and 30\% (better on 8 of 10 splits at 30\%) and is clearly better only at 60\% and 75\% (10 of 10 splits, about 5\%). Independent ridge does not beat the pooled model until 75\%.
+
+\subsection{Why the pooled model wins}
+\label{sec:res-why}
+
+Two properties combine. The first is in the data. Seven columns, including the bias, are constant within every school (\cref{sec:setup}), so a model fitted to one school can only estimate their combined effect as an intercept, and the separate effects of school-level attributes are identifiable only across schools. The pooled model estimates these shared effects with all 15,362 students, while each school-specific model must estimate its own intercept from as few as one training student at $\rho = 5\%$.
+
+The second is in the regularizers. Multi-task penalties do share information, but their shrinkage target is zero (\cref{prop:limits}), so when data are scarce and cross-validation selects strong regularization, the part all schools have in common is shrunk along with the rest. We can measure this directly. At $\rho = 5\%$ the average school model under trace-norm MTL has $57 \pm 4\%$ of the Euclidean norm of the pooled model, rising to $69\%$ at 20\% and $74\%$ at 75\%. Under mean-regularized MTL the same ratio is $134 \pm 25\%$ at 5\% and $95 \pm 4\%$ at 75\%: the shared model is not shrunk. \Cref{fig:overview} shows the learned matrices: trace-norm MTL keeps the pooled model's pattern of weights but pales it, while the mean + low-rank model reproduces the pooled weights and adds small school-specific deviations.
+
+\subsection{Partial pooling}
+\label{sec:res-partial}
+
+Mean-regularized MTL resolves the trade-off (\cref{tab:main,tab:paired}). At 5\% training it is statistically indistinguishable from pooled ridge (0.3\% worse on average, winning 4 of 10 splits). From 10\% onwards it beats pooled ridge on all 10 splits at every training fraction, by 1.9\% at 10\% rising to 6.3\% at 75\%, significant under the corrected test from 15\% onwards. It also has lower error than trace-norm MTL at every training fraction, by 19.6\% at 5\%, 5.0\% at 20\% and 1.0\% at 75\%, winning on at least 9 of 10 splits each time. It is the best method at every training fraction except 5\%, where pooled ridge is marginally ahead, and 60\%, where the mean + low-rank model is ahead by 0.04\%.
+
+Restricting the deviations to be low rank does not help. From 10\% onwards the two partial-pooling estimators are within 0.8\% of each other. At 5\% the mean + low-rank model is 1.5\% worse than mean-regularized MTL: cross-validation removes its deviations entirely on 7 of the 10 splits, reducing it to the school-weighted pooled model of \cref{prop:limits}, and overall it is 1.8\% worse than the student-weighted pooled ridge. With one or two training students in many schools, giving every school equal weight in \eqref{eq:loss} discards information that pooled ridge keeps.
+
+\subsection{Who benefits}
+\label{sec:res-who}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{fig3_per_school.pdf}
+\caption{Per-school change in test MSE at $\rho = 20\%$, averaged over 10 splits; positive values mean the first-named method is better. Each dot is one school, plotted against its size; the black line joins the median within six size groups. Sharing helps small schools most (a, b), while the gain of partial pooling over the pooled model is concentrated in a minority of schools of all sizes (c).}
+\label{fig:per-school}
+\end{figure}
+
+\Cref{fig:per-school} breaks the gains down by school at $\rho = 20\%$. Trace-norm MTL improves on independent ridge for 138 of the 139 schools, and the improvement shrinks with school size (Spearman correlation $-0.63$): the median reduction in MSE is 17.6\% for schools below the median size and 10.4\% above it. Mean-regularized MTL improves on trace-norm MTL for 117 schools, again more for small schools (median 8.3\% against 4.5\%, Spearman $-0.27$, $p = 0.001$). Its 3.6\% advantage over the pooled model is distributed differently: it is better for only 74 of the 139 schools, with no relation to size (Spearman $0.10$, $p = 0.26$). The aggregate gain comes from a minority of schools that the pooled model fits poorly, several of which see reductions of 10 to 30\%.
+
+\subsection{What structure is learned}
+\label{sec:res-structure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{fig4_structure.pdf}
+\caption{(a) Normalized singular values of the learned models at $\rho = 75\%$ (first split): the independent models, the trace-norm model and the deviations of the mean + low-rank model. (b) Structure selected by cross-validation as the training fraction grows: rank of the trace-norm model, rank of the mean + low-rank deviations and number of features kept by $\ell_{2,1}$ MTL (mean $\pm$ s.d.\ over 10 splits).}
+\label{fig:structure}
+\end{figure}
+
+\Cref{fig:structure}a shows that the independent models do not share a low-dimensional subspace on their own: their singular values decay slowly ($\sigma_2/\sigma_1 = 0.29$) over a rank of 23. The trace-norm model concentrates almost all of its energy in one direction ($\sigma_2/\sigma_1 = 0.08$, rank 7), consistent with a dominant shared component. Once that component is modeled explicitly as a mean, the deviations need only a few directions (rank 4 in this split). \Cref{fig:structure}b shows that the selected structure grows with the data: $\ell_{2,1}$ MTL keeps 7 of 28 features at 5\% and 16 at 75\%, and the rank of the mean + low-rank deviations rises from below 1 on average at 5\% to about 4 at 60\% and 75\%. The rank of the trace-norm model changes less regularly, between 3 and 8, because the same directions must carry both the shared and the school-specific parts.
+
+\subsection{Optimization: a fixed budget fails silently on unscaled features}
+\label{sec:res-optim}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.56\textwidth]{fig5_optimisation.pdf}
+\caption{Relative suboptimality of trace-norm MTL ($\lambda = 3$, $\rho = 75\%$, first split) for proximal gradient without (ISTA) and with (FISTA) momentum, on raw and standardized features. The dashed line marks the 500-iteration budget.}
+\label{fig:optim}
+\end{figure}
+
+On raw features the two numeric columns take values up to 91 and 43, and the Lipschitz constant of the loss gradient is $L = 8{,}296$. Since the step size is $1/L$, progress per iteration is tiny: after 500 iterations FISTA is still 5.9\% above the optimal objective and ISTA 41\% above (\cref{fig:optim}). Standardizing the two columns lowers $L$ to 24.5, and FISTA then reaches a relative gap of $2.2 \times 10^{-6}$ within the same budget. Nothing in the output signals the difference, so fixed-budget solvers on unscaled data can produce unconverged models whose errors are then attributed to the method. All results in this paper use standardized features, and acceleration matters as well: on standardized features ISTA is still $9.4 \times 10^{-3}$ above the optimum after 500 iterations.
+
+\subsection{Metric definitions change reported numbers}
+\label{sec:res-metrics}
+
+Explained variance on School is reported with two normalizations: by the variance of all test scores, or by the average variance within schools as in \eqref{eq:ev}. For identical predictions the two differ by 11.1 to 13.0 points (\cref{tab:metrics}): trace-norm MTL scores 26.5\% under the within-school definition and 37.9\% under the pooled one. The pooled definition credits a model for explaining differences between schools, which make up 11.5\% of the variance. Rankings are unchanged, but absolute values are not comparable across papers that normalize differently, and published numbers should be compared only after the definition is confirmed.

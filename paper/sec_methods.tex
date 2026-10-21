@@ -1,0 +1,78 @@
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Regularized multi-task learning.}
+Multi-task learning trains related predictors jointly so that tasks with little data borrow strength from the rest \citep{caruana1997multitask}; see \citet{zhang2022survey} and \citet{yu2024unleashing} for surveys. In the linear setting the coupling is usually a regularizer on the matrix of task weights. \citet{evgeniou2004regularized} penalize the distance of each task to a shared mean. \citet{argyriou2008convex} learn a shared low-dimensional representation and show that their convex formulation is equivalent to trace-norm regularization; the $\ell_{2,1}$ norm instead selects a common subset of features \citep{obozinski2010joint, liu2009multitask}. Decomposition models add a task-specific component to a shared one, giving ``dirty'' models with sparse deviations \citep{jalali2010dirty, chen2012incoherent} and robust models that isolate outlier tasks \citep{chen2011integrating}. Other work learns the task relationships themselves, as a task covariance \citep{zhang2010convex} or as overlapping groups through a shared basis \citep{kumar2012learning}. Proximal gradient methods with Nesterov acceleration \citep{beck2009fista, ji2009accelerated} are the standard solvers, and the MALSAR toolbox \citep{zhou2011malsar} packages many of these formulations together with the School data used here.
+
+\paragraph{The School benchmark.}
+The Inner London Education Authority examination data, with one regression task per secondary school, became a standard multi-task benchmark through \citet{bakker2003task} and \citet{evgeniou2005kernel}, and has been reported under several protocols since \citep{argyriou2008convex, zhang2010convex, kumar2012learning, li2019better}. The same data have a long history in multilevel modelling of school effects \citep{goldstein2011multilevel}, where the standard tool is partial pooling through hierarchical models \citep{gelman2007data}. This connection motivates the partial-pooling estimators we study.
+
+\paragraph{Baselines and evaluation in multi-task learning.}
+Recent studies of deep multi-task learning found that a well-tuned weighted sum of task losses matches specialized multi-task optimizers \citep{xin2022current, kurin2022defense}, while \citet{hu2023revisiting} show theoretical limits of such scalarization. We ask the analogous question for linear multi-task models: how much of their reported advantage survives against the simplest model that shares everything. For comparing learners over repeated random splits we follow \citet{dietterich1998approximate} and \citet{nadeau2003inference}, whose corrected resampled $t$-test accounts for the overlap between training sets.
+
+\section{Methods}
+\label{sec:methods}
+
+\subsection{Setup and notation}
+There are $t$ tasks (schools). Task $i$ has a design matrix $X_i \in \R^{n_i \times d}$ and targets $y_i \in \R^{n_i}$. A linear multi-task model is a matrix $W = [w_1, \dots, w_t] \in \R^{d \times t}$ whose column $w_i$ predicts task $i$; rows of $W$ correspond to features. All multi-task estimators below minimize the task-averaged squared loss
+\begin{equation}
+  \mathcal{L}(W) = \sum_{i=1}^{t} \frac{1}{2 n_i} \lVert X_i w_i - y_i \rVert_2^2
+  \label{eq:loss}
+\end{equation}
+plus a regularizer, so every school counts equally regardless of its size. We write $G_i = X_i^\top X_i / n_i$ and $B_i = X_i^\top y_i / n_i$, so that $\nabla_{w_i} \mathcal{L} = G_i w_i - B_i$.
+
+\subsection{Estimators}
+We compare six estimators that span the range from sharing everything to sharing nothing.
+
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Pooled ridge} fits one model to all students, $\min_w \frac{1}{2N} \sum_i \lVert X_i w - y_i \rVert_2^2 + \frac{\mu}{2} \lVert w \rVert_2^2$ with $N = \sum_i n_i$, and uses it for every school.
+\item \textbf{Independent ridge} fits each school separately, $\min_{w_i} \frac{1}{2 n_i} \lVert X_i w_i - y_i \rVert_2^2 + \frac{\mu}{2} \lVert w_i \rVert_2^2$.
+\item \textbf{$\ell_{2,1}$ MTL} minimizes $\mathcal{L}(W) + \lambda \lVert W \rVert_{2,1}$, where $\lVert W \rVert_{2,1} = \sum_{j=1}^{d} \lVert w^{j} \rVert_2$ sums the norms of the rows; it removes a feature from all schools at once.
+\item \textbf{Trace-norm MTL} minimizes $\mathcal{L}(W) + \lambda \lVert W \rVert_*$, where $\lVert W \rVert_*$ is the sum of singular values; it forces all task models into a shared low-dimensional subspace.
+\item \textbf{Mean-regularized MTL} writes $W = b \one^\top + V$, a shared mean $b \in \R^d$ plus task deviations $V$, and minimizes $\mathcal{L}(b \one^\top + V) + \frac{\lambda}{2} \lVert V \rVert_F^2 + \frac{\mu_b}{2} \lVert b \rVert_2^2$. This is the formulation of \citet{evgeniou2004regularized} and the frequentist analogue of a random-coefficient hierarchical model.
+\item \textbf{Mean + low-rank MTL} uses the same decomposition with a trace-norm penalty on the deviations, $\mathcal{L}(b \one^\top + V) + \lambda \lVert V \rVert_* + \frac{\mu_b}{2} \lVert b \rVert_2^2$: schools share a mean model and differ from it along a few common directions.
+\end{enumerate}
+
+The last two are partial-pooling estimators: they shrink each school towards a learned common model instead of towards zero. We fix $\mu_b = 10^{-6}$, which only guards against an ill-conditioned shared design. We do not claim either estimator is new; mean-regularized MTL is a classic, and the mean + low-rank model is a special case of the decomposition models above. Their ability to adapt to the unknown similarity between tasks is analysed by \citet{duan2023adaptive}. Our point is to measure them against the pooled baseline across training fractions, whereas earlier School comparisons used a single, large training fraction.
+
+The difference between shrinking towards zero and shrinking towards a common model is exact under heavy regularization. Let $B = [B_1, \dots, B_t]$, let $b_\infty = (\sum_i G_i + \mu_b I)^{-1} \sum_i B_i$ be the school-weighted pooled model, and let $\Gamma_0 = [\,G_i b_\infty - B_i\,]_{i=1}^{t}$ be the residual gradient of the tasks at that model.
+
+\begin{proposition}
+\label{prop:limits}
+(i) Trace-norm MTL returns $W = 0$ if and only if $\lambda \geq \lVert B \rVert_2$, and $\ell_{2,1}$ MTL returns $W = 0$ if and only if $\lambda \geq \max_j \lVert B^{j} \rVert_2$, where $B^{j}$ is row $j$ of $B$.
+(ii) Mean + low-rank MTL returns $W = b_\infty \one^\top$ if and only if $\lambda \geq \lVert \Gamma_0 \rVert_2$.
+(iii) Mean-regularized MTL converges to $b_\infty \one^\top$ as $\lambda \to \infty$.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+(i) The gradient of $\mathcal{L}$ at $W = 0$ is $-B$, and $0$ is optimal if and only if $B$ lies in $\lambda$ times the subdifferential of the norm at $0$: the unit ball of the spectral norm for the trace norm, and the set of matrices whose rows all have Euclidean norm at most one for $\ell_{2,1}$. (ii) The reduced objective $f(V) = \min_b \mathcal{L}(b\one^\top + V) + \frac{\mu_b}{2}\lVert b \rVert^2$ is convex and differentiable with $b^\star(0) = b_\infty$ and $\nabla f(0) = \Gamma_0$, so $V = 0$ is optimal if and only if $\lVert \Gamma_0 \rVert_2 \leq \lambda$. (iii) In \eqref{eq:meanreg}, $\lambda G_i R_i \to G_i$ and $\lambda R_i \to I$ as $\lambda \to \infty$, so $b \to b_\infty$ and $v_i = R_i (B_i - G_i b) \to 0$.
+\end{proof}
+
+Heavy regularization therefore sends trace-norm and $\ell_{2,1}$ MTL to the zero predictor, but sends both partial-pooling estimators to a pooled model. That pooled model weights each school equally, unlike pooled ridge, which weights each student equally; the two coincide only when all schools have the same size. Both thresholds hold numerically: on a 5\% training split, mean + low-rank MTL returns $V = 0$ exactly at $\lambda = 1.02\lVert \Gamma_0 \rVert_2$ but not at $0.98\lVert \Gamma_0 \rVert_2$, and the same holds for trace-norm MTL with $\lVert B \rVert_2$.
+
+\subsection{Optimization}
+\label{sec:optim}
+Pooled and independent ridge have closed forms. For $\ell_{2,1}$ and trace-norm MTL we use FISTA \citep{beck2009fista}: with step $1/L$, $L = \max_i \lVert G_i \rVert_2$ the Lipschitz constant of $\nabla \mathcal{L}$, each iteration takes a gradient step on $\mathcal{L}$ at an extrapolated point and applies the proximal operator of the regularizer. The $\ell_{2,1}$ prox scales each row $v^j$ by $\max(0, 1 - \tau / \lVert v^j \rVert_2)$, and the trace-norm prox soft-thresholds the singular values, which costs one SVD of a $d \times t$ matrix per iteration. We run a fixed budget of 500 iterations; \cref{sec:res-optim} checks that this budget is adequate once features are standardized.
+
+Mean-regularized MTL has an exact solution. Setting the gradient with respect to each $v_i$ to zero gives $v_i = R_i (B_i - G_i b)$ with $R_i = (G_i + \lambda I)^{-1}$; substituting back and using $G_i - G_i R_i G_i = \lambda G_i R_i$ yields a $d \times d$ system for the shared mean,
+\begin{equation}
+  \Big( \lambda \sum_{i=1}^{t} G_i R_i + \mu_b I \Big) b = \lambda \sum_{i=1}^{t} R_i B_i .
+  \label{eq:meanreg}
+\end{equation}
+For mean + low-rank MTL, $b$ can be minimized exactly for any fixed $V$, $b^\star(V) = (\sum_i G_i + \mu_b I)^{-1} \sum_i (B_i - G_i v_i)$. The reduced objective $\min_b \mathcal{L}(b\one^\top + V)$ is convex and smooth in $V$, with gradient $G_i (b^\star(V) + v_i) - B_i$ in column $i$ and a Lipschitz constant no larger than $\max_i \lVert G_i \rVert_2$, so we apply FISTA to it directly (\cref{alg:mlr}). On School, 500 iterations bring the objective within $0.01\%$ of the value reached after 5,000.
+
+\begin{algorithm}[t]
+\caption{Mean + low-rank MTL by FISTA on the reduced objective}
+\label{alg:mlr}
+\begin{algorithmic}[1]
+\REQUIRE $\{G_i, B_i\}_{i=1}^{t}$, penalty $\lambda$, iterations $K$
+\STATE $L \leftarrow \max_i \lVert G_i \rVert_2$; \; $V \leftarrow Z \leftarrow 0_{d \times t}$; \; $s \leftarrow 1$
+\FOR{$k = 1, \dots, K$}
+  \STATE $b \leftarrow (\sum_i G_i + \mu_b I)^{-1} \sum_i (B_i - G_i z_i)$ \hfill (exact shared mean at $Z$)
+  \STATE $\Gamma \leftarrow [\,G_i (b + z_i) - B_i\,]_{i=1}^{t}$ \hfill (gradient of the reduced objective)
+  \STATE $V^{+} \leftarrow \prox_{(\lambda/L) \lVert \cdot \rVert_*}\!\big(Z - \Gamma / L\big)$ \hfill (singular value thresholding)
+  \STATE $s^{+} \leftarrow \big(1 + \sqrt{1 + 4 s^2}\big)/2$; \; $Z \leftarrow V^{+} + \frac{s - 1}{s^{+}} (V^{+} - V)$; \; $V \leftarrow V^{+}$; \; $s \leftarrow s^{+}$
+\ENDFOR
+\ENSURE $W = b^\star(V) \one^\top + V$
+\end{algorithmic}
+\end{algorithm}

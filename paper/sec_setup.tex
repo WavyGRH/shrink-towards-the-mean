@@ -1,0 +1,25 @@
+\section{Experimental Setup}
+\label{sec:setup}
+
+\paragraph{Data.}
+We use the School data as distributed with MALSAR \citep{zhou2011malsar}: 139 schools (tasks) and 15,362 students, with 22 to 251 students per school (median 103). Each student is described by 27 binary or numeric attributes, obtained by one-hot encoding the examination year, four school-level and three student-level attributes \citep{argyriou2008convex}, plus a constant bias column, so $d = 28$. The target is the examination score (range 1 to 70, mean 20.6, s.d.\ 12.7). We standardize the two numeric columns using training-set statistics and leave the binary columns and the targets unchanged.
+
+\paragraph{A structural property of the data.}
+Seven of the 28 columns (six one-hot columns encoding school-level attributes, and the bias) are constant within every school. As a result each school's own design matrix has rank between 5 and 16 (median 11), whereas the stacked design of all schools has rank 23. A model fitted to one school can only estimate the combined effect of its constant columns, folded into a single intercept; the separate effects of school-level attributes are identified only across schools. Between-school differences account for 11.5\% of the variance of the scores. \Cref{sec:res-why} returns to this property.
+
+\paragraph{Protocol.}
+For each training fraction $\rho \in \{5, 10, 15, 20, 30, 60, 75\}\%$ we draw 10 random splits. In each split, every school contributes $\max(1, \operatorname{round}(\rho\, n_i))$ randomly chosen students to the training set and the rest to the test set. All hyperparameters are chosen by 5-fold cross-validation inside the training set, with folds formed within each school so that every school keeps at least one training student in every fold; the grids are listed in \cref{tab:hyper}. The same splits and folds are used for every method, so comparisons are paired. The two protocols in \cref{tab:repro} correspond to $\rho = 75\%$ \citep{argyriou2008convex, zhang2010convex} and $\rho = 60\%$ \citep{kumar2012learning}.
+
+\paragraph{Metrics.}
+Let $e$ be the vector of all test residuals and $y$ all test scores. We report the normalized mean squared error $\nmse = \operatorname{mean}(e^2) / \operatorname{Var}(y)$, the root mean squared error in exam points, and the explained variance of \citet{argyriou2008convex}, which normalizes by the variance \emph{within} schools,
+\begin{equation}
+  \mathrm{EV}_{\mathrm{within}} = 1 - \frac{\tfrac{1}{t}\sum_i \operatorname{mean}(e_i^2)}{\tfrac{1}{t}\sum_i \operatorname{Var}(y_i)} ,
+  \label{eq:ev}
+\end{equation}
+where $e_i$ and $y_i$ are the test residuals and scores of school $i$. \Cref{sec:res-metrics} shows that this choice matters.
+
+\paragraph{Statistical comparison.}
+For a pair of methods we report the mean paired difference over the 10 splits, the number of splits won, and the corrected resampled $t$-test of \citet{nadeau2003inference}, which inflates the variance of the mean difference by the factor $1/J + n_{\text{test}}/n_{\text{train}}$ with $J = 10$. Because $n_{\text{test}}/n_{\text{train}} = (1 - \rho)/\rho$ reaches 19 at $\rho = 5\%$, this test is very conservative for small training fractions, so we read win counts alongside it.
+
+\paragraph{Implementation.}
+All methods are implemented in NumPy. FISTA uses a fixed budget of 500 iterations with step $1/L$, and the gradient of \eqref{eq:loss} is computed from the precomputed $G_i$ and $B_i$. The full study (7 training fractions $\times$ 10 splits $\times$ 6 methods, each with cross-validation) runs in about 35 minutes on two CPU cores.

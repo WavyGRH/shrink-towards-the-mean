@@ -1,0 +1,19 @@
+\begin{table}[h]
+\centering
+\caption{Hyperparameter grids (log-spaced; number of values in parentheses) and the median value selected by 5-fold cross-validation at each training fraction. Across all 420 selections, 0 fell on the boundary of a grid.}
+\label{tab:hyper}
+\footnotesize
+\setlength{\tabcolsep}{3.2pt}
+\begin{tabular}{@{}llccccccc@{}}
+\toprule
+Method & Grid (values) & 5\% & 10\% & 15\% & 20\% & 30\% & 60\% & 75\% \\
+\midrule
+Pooled ridge & $\mu$: $10^{-6}$ to $10^{2}$ (17) & 0.01 & 0.01 & $3.2\cdot 10^{-3}$ & $3.2\cdot 10^{-3}$ & $3.2\cdot 10^{-3}$ & $6.6\cdot 10^{-4}$ & $3.2\cdot 10^{-5}$ \\
+Independent ridge & $\mu$: $10^{-6}$ to $10^{2}$ (17) & 0.32 & 0.32 & 0.32 & 0.1 & 0.1 & 0.032 & 0.032 \\
+$\ell_{2,1}$ MTL & $\lambda$: $10^{-1.5}$ to $10^{2.5}$ (12) & 26 & 11 & 11 & 11 & 4.8 & 2.1 & 2.1 \\
+Trace-norm MTL & $\lambda$: $10^{-1.5}$ to $10^{2.5}$ (12) & 26 & 18 & 11 & 11 & 11 & 4.8 & 4.8 \\
+Mean-reg.\ MTL & $\lambda$: $10^{-4}$ to $10^{3}$ (15) & 32 & 10 & 10 & 3.2 & 3.2 & 1 & 1 \\
+Mean + low-rank MTL & $\lambda$: $10^{-2.5}$ to $10^{3.5}$ (15) & 164 & 61 & 61 & 23 & 23 & 8.5 & 8.5 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,23 @@
+\begin{table}[t]
+\centering
+\caption{Test nMSE (MSE divided by the variance of test scores; lower is better) as a function of the training fraction per school $\rho$. Mean $\pm$ s.d.\ over 10 random splits; best in bold, second best underlined.}
+\label{tab:main}
+\small
+\setlength{\tabcolsep}{3.6pt}
+\begin{tabular}{@{}lccccccc@{}}
+\toprule
+& \multicolumn{7}{c}{Training fraction per school $\rho$} \\
+\cmidrule(l){2-8}
+Method & 5\% & 10\% & 15\% & 20\% & 30\% & 60\% & 75\% \\
+\midrule
+Pooled ridge & \textbf{.677}\,{\scriptsize$\pm$.004} & .669\,{\scriptsize$\pm$.003} & .667\,{\scriptsize$\pm$.001} & .665\,{\scriptsize$\pm$.002} & .663\,{\scriptsize$\pm$.004} & .660\,{\scriptsize$\pm$.008} & .656\,{\scriptsize$\pm$.013} \\
+Independent ridge & 1.045\,{\scriptsize$\pm$.023} & .889\,{\scriptsize$\pm$.012} & .826\,{\scriptsize$\pm$.012} & .773\,{\scriptsize$\pm$.006} & .727\,{\scriptsize$\pm$.004} & .660\,{\scriptsize$\pm$.009} & .649\,{\scriptsize$\pm$.012} \\
+\midrule
+$\ell_{2,1}$ MTL & .959\,{\scriptsize$\pm$.016} & .816\,{\scriptsize$\pm$.014} & .760\,{\scriptsize$\pm$.011} & .741\,{\scriptsize$\pm$.007} & .697\,{\scriptsize$\pm$.004} & .652\,{\scriptsize$\pm$.006} & .640\,{\scriptsize$\pm$.012} \\
+Trace-norm MTL & .844\,{\scriptsize$\pm$.015} & .748\,{\scriptsize$\pm$.013} & .691\,{\scriptsize$\pm$.010} & .675\,{\scriptsize$\pm$.004} & .659\,{\scriptsize$\pm$.003} & .626\,{\scriptsize$\pm$.007} & .621\,{\scriptsize$\pm$.012} \\
+\midrule
+Mean-reg.\ MTL & \underline{.679}\,{\scriptsize$\pm$.008} & \textbf{.657}\,{\scriptsize$\pm$.004} & \textbf{.648}\,{\scriptsize$\pm$.002} & \textbf{.641}\,{\scriptsize$\pm$.003} & \textbf{.633}\,{\scriptsize$\pm$.004} & \underline{.620}\,{\scriptsize$\pm$.008} & \textbf{.615}\,{\scriptsize$\pm$.012} \\
+Mean + low-rank MTL & .689\,{\scriptsize$\pm$.007} & \underline{.657}\,{\scriptsize$\pm$.003} & \underline{.653}\,{\scriptsize$\pm$.003} & \underline{.641}\,{\scriptsize$\pm$.002} & \underline{.635}\,{\scriptsize$\pm$.004} & \textbf{.619}\,{\scriptsize$\pm$.008} & \underline{.616}\,{\scriptsize$\pm$.013} \\
+\bottomrule
+\end{tabular}
+\end{table}

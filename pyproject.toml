@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mtlpool"
+version = "1.0.0"
+description = "Pooling baselines and partial pooling for regularized multi-task learning on the School benchmark"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Devangan Mukherjee" }]
+requires-python = ">=3.9"
+dependencies = ["numpy>=1.22", "scipy>=1.8"]
+
+[project.optional-dependencies]
+figures = ["matplotlib>=3.6"]
+test = ["pytest>=7"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,22 @@
+\begin{table}[t]
+\centering
+\caption{Paired comparisons on the same splits. Each cell gives the relative nMSE change of the first method against the second (\%, negative means the first method is better) and, in parentheses, the number of the 10 splits on which the first method wins. $^{\dagger}$: two-sided $p < 0.05$ under the corrected resampled $t$-test of \citet{nadeau2003inference}, which is conservative when the test set is much larger than the training set (small $\rho$). Indep.: independent ridge; Pooled: pooled ridge; Trace: trace-norm MTL; MR: mean-regularized MTL; MLR: mean + low-rank MTL.}
+\label{tab:paired}
+\footnotesize
+\setlength{\tabcolsep}{4.2pt}
+\begin{tabular}{@{}lccccccc@{}}
+\toprule
+& \multicolumn{7}{c}{Training fraction per school $\rho$} \\
+\cmidrule(l){2-8}
+Comparison & 5\% & 10\% & 15\% & 20\% & 30\% & 60\% & 75\% \\
+\midrule
+Trace vs.\ Indep. & $-19.2$\,{\scriptsize(10)} & $-15.9$$^{\dagger}$\,{\scriptsize(10)} & $-16.4$$^{\dagger}$\,{\scriptsize(10)} & $-12.7$$^{\dagger}$\,{\scriptsize(10)} & $-9.4$$^{\dagger}$\,{\scriptsize(10)} & $-5.2$$^{\dagger}$\,{\scriptsize(10)} & $-4.4$$^{\dagger}$\,{\scriptsize(10)} \\
+Trace vs.\ Pooled & $+24.7$$^{\dagger}$\,{\scriptsize(0)} & $+11.7$\,{\scriptsize(0)} & $+3.5$\,{\scriptsize(0)} & $+1.5$\,{\scriptsize(0)} & $-0.7$\,{\scriptsize(8)} & $-5.0$$^{\dagger}$\,{\scriptsize(10)} & $-5.3$$^{\dagger}$\,{\scriptsize(10)} \\
+MR vs.\ Pooled & $+0.3$\,{\scriptsize(4)} & $-1.9$\,{\scriptsize(10)} & $-2.8$$^{\dagger}$\,{\scriptsize(10)} & $-3.6$$^{\dagger}$\,{\scriptsize(10)} & $-4.6$$^{\dagger}$\,{\scriptsize(10)} & $-6.1$$^{\dagger}$\,{\scriptsize(10)} & $-6.3$$^{\dagger}$\,{\scriptsize(10)} \\
+MR vs.\ Trace & $-19.6$\,{\scriptsize(10)} & $-12.2$\,{\scriptsize(10)} & $-6.1$\,{\scriptsize(10)} & $-5.0$$^{\dagger}$\,{\scriptsize(10)} & $-3.9$$^{\dagger}$\,{\scriptsize(10)} & $-1.1$\,{\scriptsize(9)} & $-1.0$$^{\dagger}$\,{\scriptsize(10)} \\
+MLR vs.\ Pooled & $+1.8$\,{\scriptsize(1)} & $-1.9$\,{\scriptsize(10)} & $-2.1$\,{\scriptsize(10)} & $-3.5$$^{\dagger}$\,{\scriptsize(10)} & $-4.3$$^{\dagger}$\,{\scriptsize(10)} & $-6.1$$^{\dagger}$\,{\scriptsize(10)} & $-6.1$$^{\dagger}$\,{\scriptsize(10)} \\
+MLR vs.\ Trace & $-18.3$$^{\dagger}$\,{\scriptsize(10)} & $-12.2$$^{\dagger}$\,{\scriptsize(10)} & $-5.4$\,{\scriptsize(10)} & $-4.9$$^{\dagger}$\,{\scriptsize(10)} & $-3.6$$^{\dagger}$\,{\scriptsize(10)} & $-1.1$\,{\scriptsize(10)} & $-0.8$$^{\dagger}$\,{\scriptsize(10)} \\
+MLR vs.\ MR & $+1.5$\,{\scriptsize(0)} & $+0.0$\,{\scriptsize(3)} & $+0.8$\,{\scriptsize(1)} & $+0.1$\,{\scriptsize(4)} & $+0.3$\,{\scriptsize(0)} & $-0.0$\,{\scriptsize(4)} & $+0.1$\,{\scriptsize(2)} \\
+\bottomrule
+\end{tabular}
+\end{table}

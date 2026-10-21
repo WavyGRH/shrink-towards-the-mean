@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the report below."
+title: "shrink-towards-the-mean: code for Shrink Towards the Mean, Not Towards Zero"
+authors:
+  - family-names: Mukherjee
+    given-names: Devangan
+    affiliation: "Indian Institute of Technology Kharagpur"
+version: 1.0.0
+date-released: 2026-10-21
+license: MIT
+keywords:
+  - multi-task learning
+  - partial pooling
+  - trace norm
+  - School benchmark
+  - reproducibility
+preferred-citation:
+  type: report
+  title: "Shrink Towards the Mean, Not Towards Zero: Revisiting Pooling Baselines for Regularized Multi-Task Learning on the School Benchmark"
+  authors:
+    - family-names: Mukherjee
+      given-names: Devangan
+      affiliation: "Indian Institute of Technology Kharagpur"
+  year: 2026

@@ -1,0 +1,5 @@
+# Versions used for the paper (Python 3.13). Older versions should give the same numbers up to ~1e-12.
+numpy==2.5.3
+scipy==1.18.1
+matplotlib==3.11.2
+pytest==9.1.1

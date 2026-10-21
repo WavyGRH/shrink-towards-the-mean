@@ -1,0 +1,29 @@
+\begin{table}[t]
+\centering
+\caption{Reproduction of published School results. Explained variance (EV, within schools, \%; higher is better) under the protocol of \citet{argyriou2008convex} ($\rho = 75\%$) and RMSE in exam points (lower is better) under the protocol of \citet{kumar2012learning} ($\rho = 60\%$). Ours: mean $\pm$ s.d.\ over 10 random splits. Published values are copied from the cited papers; blank cells were not reported or not run. The bottom four rows are published methods we did not re-implement.}
+\label{tab:repro}
+\small
+\setlength{\tabcolsep}{2.7pt}
+\begin{tabular}{@{}llccccc@{}}
+\toprule
+& & \multicolumn{3}{c}{EV within schools (\%), $\rho = 75\%$} & \multicolumn{2}{c}{RMSE, $\rho = 60\%$} \\
+\cmidrule(lr){3-5}\cmidrule(l){6-7}
+Method & Published counterpart & Ours & A08 & ZY10 & Ours & KD12 \\
+\midrule
+Pooled ridge & Aggregate & $22.0 \pm 1.6$ & $22.7 \pm 1.3$ &  & $10.34 \pm 0.06$ &  \\
+Independent ridge & Independent / STL & $22.1 \pm 1.8$ & $23.8 \pm 2.1$ & $23.5 \pm 1.9$ & $10.34 \pm 0.05$ & $10.67 \pm 0.20$ \\
+$\ell_{2,1}$ MTL & MTL-FEAT (var.\ sel.) & $23.6 \pm 1.8$ & $24.8 \pm 2.0$ &  & $10.27 \pm 0.06$ &  \\
+Trace-norm MTL & MTL-FEAT / MTFL & $26.5 \pm 1.5$ & $26.7 \pm 2.0$ & $26.7 \pm 2.0$ & $10.07 \pm 0.06$ &  \\
+Mean-reg.\ MTL &  & $27.3 \pm 1.5$ &  &  & $10.02 \pm 0.06$ &  \\
+Mean + low-rank MTL &  & $27.3 \pm 1.5$ &  &  & $10.02 \pm 0.06$ &  \\
+\midrule
+Multi-task GP & MTGP & & & $29.2 \pm 1.6$ & & \\
+MTRL & MTRL & & & $29.9 \pm 1.8$ & & \\
+No-group MTL & No-group MTL & & & & & $10.18 \pm 0.15$ \\
+GO-MTL & GO-MTL & & & & & $10.04 \pm 0.24$ \\
+\bottomrule
+\end{tabular}
+
+\vspace{2pt}
+{\footnotesize A08: \citet{argyriou2008convex}; ZY10: \citet{zhang2010convex}; KD12: \citet{kumar2012learning}.}
+\end{table}
